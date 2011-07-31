@@ -29,7 +29,9 @@ $html_content = <<<EOHTML
     </style>
   </head>
   <body>
-    <h1><strong>Doppler</strong> (client-side console)</h1>
+    <a class="doppler-hidden-button" href="/">
+      <h1><strong>Doppler</strong> (client-side console)</h1>
+    </a>
     <div id="doppler-runner">
       <form action="" method="POST" class="doppler-image-test">
         <input type="hidden" name="__image__" value="1" />
@@ -240,6 +242,23 @@ input.inputsubmit {
 
 input.inputsubmit:hover {
   background: #CCC;
+}
+
+a.doppler-hidden-button {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+a.doppler-hidden-button:hover {
+  cursor: pointer;
+  text-decoration: none;
+  color: white;
+}
+
+a.doppler-hidden-button:visited {
+  cursor: pointer;
+  text-decoration: none;
+  color: white;
 }
 EOCSS;
 }
