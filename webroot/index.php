@@ -88,7 +88,7 @@ function build_doppler_corpus($target_url, $target_domain) {
   doppler.open("GET", "{$target_url}");
   doppler.onreadystatechange = function() {
     if ((doppler.readyState == 4) && (doppler.status == 200)) {
-      end = new Date();
+      end = new Date().getTime();
       s.innerHTML = '--- Doppler Completed! ---';
       s.style.background = '#68A64D';
       doppler_response = JSON.parse(doppler.responseText);
@@ -97,8 +97,8 @@ function build_doppler_corpus($target_url, $target_domain) {
       e.innerHTML =
         "<h3>Information:</h3> <br>" +
         "<strong>Target site:</strong>    " + "{$target_domain}" + "<br><br>" +
-        "<strong>TOTAL REQUEST:</strong>  " +
-          (duration+(doppler_response.epoch/1000)) + " ms<br>" +
+        "<strong>NETWORK LATENCY:</strong>  " +
+          (duration-(doppler_response.epoch/1000)) + " ms<br>" +
         "<strong>Request Duration:</strong>   " +
           duration + " ms " + "<br>" +
         "<strong>Server Processing Time:</strong>   " +
@@ -114,7 +114,7 @@ function build_doppler_corpus($target_url, $target_domain) {
   };
 
   // PUT STUFF BEFORE THIS -----------------------------------------------------
-  start = new Date();
+  start = new Date().getTime();
   doppler.send();
 </script>
 EODOPPLER;
