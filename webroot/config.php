@@ -3,4 +3,4 @@
 // Use of this source code is governed by a Apache License (v2.0) that can be
 // found in the LICENSE file.
 
-return $url = "http://dev.ca.com/doppler/xyzroot";
+return "http://doppler.example.com";

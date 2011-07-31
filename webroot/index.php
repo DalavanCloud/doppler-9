@@ -107,7 +107,6 @@ function build_doppler_corpus($target_url, $target_domain) {
           "Started at:         " + start + "<br>" +
           "Completed at:    " + end;
 
-      // basic JSON transform
       c.innerHTML = '<strong>RESPONSE TO:</strong>  <i>' +
                     doppler_response.title + '</i><br><br>' +
                     doppler_response.content;

@@ -7,9 +7,8 @@
  * Doppler request controller
  */
 
-$valid_domain = @include dirname(__file__).'/config.php';
-
 $start = microtime(true);
+$valid_domain = @include dirname(__file__).'/config.php';
 
 $path = $_REQUEST['__path__'];
 $get = $_GET['bkg'];
