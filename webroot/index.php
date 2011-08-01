@@ -9,23 +9,14 @@
 
 $target_domain = @include dirname(__file__).'/config.php';
 
-$user_ip = null;
-if (isset($_SERVER["HTTP_X_FORWARDED_FOR"])) {
-  $user_ip = $_SERVER["HTTP_X_FORWARDED_FOR"];
-} else if (isset($_SERVER["HTTP_CLIENT_IP"])) {
-  $user_ip = $_SERVER["HTTP_CLIENT_IP"];
-} else if (isset($_SERVER["REMOTE_ADDR"])) {
-  $user_ip = $_SERVER["REMOTE_ADDR"];
-}
-
 $doppler_corpus = null;
 if ($_POST) {
-  $request = $_POST['__image__'] ? '?test=image' : '?test=lorem';
-  $request .= '&origin='.$target_domain[1];
-  $unique_host = str_replace('.', '', $user_ip).'-'.uniqid();
-  $request_url = 'http://'.$unique_host.$target_domain[0].'/'.$request;
+  $request = $_POST['__image__'] ? '?bkg=1' : '?';
+  $request_url = $target_domain.'/'.$request;
   $doppler_corpus = build_doppler_corpus($request_url, $target_domain);
 }
+
+$css_style = build_css();
 
 $html_content = <<<EOHTML
 <!DOCTYPE html>
@@ -33,7 +24,9 @@ $html_content = <<<EOHTML
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>Doppler Client-side</title>
-    <link rel="stylesheet" type="text/css" href="style.css" />
+    <style>
+      {$css_style}
+    </style>
   </head>
   <body>
     <a class="doppler-hidden-button" href="/">
@@ -122,9 +115,150 @@ function build_doppler_corpus($target_url, $target_domain) {
     }
   };
 
+  // PUT STUFF BEFORE THIS -----------------------------------------------------
   start = new Date().getTime();
   doppler.send();
 </script>
 EODOPPLER;
 }
 
+
+function build_css() {
+  return <<<EOCSS
+body {
+  margin: 0;
+  padding: 0;
+  font-size: 1.1em;
+  font-family: "lucida grande",tahoma,verdana,arial,sans-serif;
+}
+
+h1 {
+
+  margin: 0;
+  padding: 1em 20%;
+  font-family: "Verdana";
+  font-weight: normal;
+  color: white;
+  background: #D09;
+}
+
+h1 strong {
+  font-weight: bolder;
+}
+
+h3 {
+  margin: 0;
+  padding: 0;
+  padding-bottom: 5px;
+  border-bottom: 1px solid white;
+}
+
+h4 {
+  margin: 0;
+  margin-bottom: 0.5em;
+  padding-bottom: 5px;
+  font-size: 2em;
+  font-weight: normal;
+  color: #777;
+  border-bottom: 1px solid #888;
+}
+
+.ws {
+  white-space: pre;
+}
+
+form.doppler-image-test {
+  float: right;
+  display: block;
+}
+
+#doppler-runner {
+  padding: 0.5em 20%;
+  background: #C08;
+  margin-bottom: 1em;
+}
+
+#doppler-core {
+  display: block;
+  clear: both;
+  text-align:left;
+  font-size: 13px;
+  line-height: 1.6em;
+  padding: 0 20% 2em;
+}
+
+#doppler-status {
+  padding: 10px;
+  font-weight: bold;
+  font-size: 16px;
+  color: white;
+  display:block;
+  border-top: 2px solid #888;
+  background: #AAA;
+}
+
+#doppler-epoch {
+  padding:10px;
+  display:block;
+  border-top: 1px solid white;
+  background: #A6DDFF;
+}
+
+#doppler-content {
+  padding:10px;
+  word-wrap: break-word;
+  border-top: 1px solid #888
+}
+
+#doppler-footer {
+  padding: 1em 20%;
+  font-size: 0.7em;
+  color: #777;
+}
+
+#doppler-footer-content {
+  padding-top: 1em;
+  border-top: 1px solid #AAA;
+}
+
+input.inputsubmit {
+  font-size: 13px;
+  font-weight: bold;
+  text-align: center;
+  color: #666;
+  cursor: pointer;
+  text-decoration: none;
+  vertical-align: middle;
+  white-space: nowrap;
+  line-height: 18px;
+  padding: 2px 8px 2px 8px;
+  background-color: #BBB;
+  border: 1px solid #888;
+  border-bottom-color: rgba(0,0,0,0.2);
+  box-shadow: 0px 1px 0px rgba(0,0,0,0.2);
+  -moz-box-shadow: 0px 1px 0px rgba(0,0,0,0.2);
+  -webkit-box-shadow: 0px 1px 0px rgba(0,0,0,0.2);
+}
+
+input.inputsubmit:hover {
+  background: #CCC;
+}
+
+a.doppler-hidden-button {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+a.doppler-hidden-button:hover {
+  cursor: pointer;
+  text-decoration: none;
+  color: white;
+}
+
+a.doppler-hidden-button:visited {
+  cursor: pointer;
+  text-decoration: none;
+  color: white;
+}
+EOCSS;
+}

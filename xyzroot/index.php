@@ -1,5 +1,4 @@
 <?php
-$start = microtime(true);
 // Copyright (c) 2011 Cristian Adamo. All rights reserved.
 // Use of this source code is governed by a Apache License (v2.0) that can be
 // found in the LICENSE file.
@@ -7,14 +6,15 @@ $start = microtime(true);
 /**
  * Doppler request controller
  */
+
+$start = microtime(true);
+$valid_domain = @include dirname(__file__).'/config.php';
+
 $path = $_REQUEST['__path__'];
-$run_test = $_GET['test'];
-$statistics = $_GET['stats'];
-$origin = $_GET['origin'];
+$get = $_GET['bkg'];
 
-$files = '(dns|http).gif';
+$file = 'bkg.gif';
 $tokens = array("\r\n", "\n", "\r");
-
 $lorem_ipsum = <<<EOLOREM
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque accumsan
 semper magna eget euismod. Nullam adipiscing sem sed augue pulvinar varius.
@@ -32,14 +32,10 @@ tincidunt. Donec sapien risus, cursus eu facilisis faucibus, lobortis quis quam.
 Nulla posuere.
 EOLOREM;
 
-if ($statistics) {
-  @file_put_contents('doppler.log', $statistics, FILE_APPEND);
-}
-
 $response = array('DOPPLER-NO-REQUEST-TEST', 'doppler-response-here');
-if (preg_match('#(.*)'.$files.'($|(.*)$)#', $path) || ($run_test == 'image')) {
+if (preg_match('#(.*)'.$file.'($|(.*)$)#', $path) || $get) {
   $finfo = new finfo(FILEINFO_MIME);
-  $mime = $finfo->file('dns.gif');
+  $mime = $finfo->file($file);
   if ($path) {
     header("Content-Type: {$mime};");
   } else {
@@ -48,14 +44,14 @@ if (preg_match('#(.*)'.$files.'($|(.*)$)#', $path) || ($run_test == 'image')) {
   $response = array(
     'DOPPLER-IMAGE-FILE-TEST',
     base64_encode(file_get_contents($file)));
-} else if  ($run_test == 'lorem') {
+} else {
   header("Content-Type: text/plain; charset=UTF-8");
   $response = array(
     'DOPPLER-LOREM-IPSUM-TEST',
     str_replace($tokens, '', $lorem_ipsum));
 }
 
-header("Access-Control-Allow-Origin: {$origin}");
+header("Access-Control-Allow-Origin: {$valid_domain}");
 header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 
