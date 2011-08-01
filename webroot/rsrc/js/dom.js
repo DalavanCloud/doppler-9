@@ -1,7 +1,7 @@
 /**
  * DOM handling
  */
-JG.Provide('DOM', {
+CX.provide('DOM', {
   append: function(node, data) {
     node.appendChild(data);
   }.
@@ -23,7 +23,7 @@ JG.Provide('DOM', {
  * @param  id     ID that we have to lookup on the document
  * @return node   node where the ID was found.
  */
-JG.$ = function(id) {
+CX.$ = function(id) {
   var node = document.getElementById(id);
   if (!node || (node.id != id)) {
     throw new Error(
@@ -41,7 +41,7 @@ JG.$ = function(id) {
  * @param  value  attribute value.
  * @return bool   If the attribute was changed TRUE, else FALSE.
  */
-JG.$A = function(node, attribute, value) {
+CX.$A = function(node, attribute, value) {
   try {
     prev_value = node.getAttribute(attribute);
     node.setAttribute(attribute, value);

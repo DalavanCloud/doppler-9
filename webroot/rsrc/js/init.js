@@ -8,7 +8,7 @@
  */
 (function() {
 
-  if (window.JG) {
+  if (window.CX) {
     return;
   }
 
@@ -19,29 +19,64 @@
     return obj;
   };
 
-  window.JG = {
+  CX = {
     /**
      * Basic object installation
+     *
+     * NOTE: if you new object has a member called construct, it will be called
+     * on you create a new instance of it.
      */
-    Provide: function(name, structure) {
-      var jagger = window.JG[name];
+    provide: function(name, structure) {
+      var jagger = window.CX;
+      jagger[name] = {};
 
+      CX.log('Creating class ' + name);
       var Class = (function(name, structure){
-        var ret = function() {
-          (structure.construct || JG.Null).apply(this, arguments);
+        return function() {
+          return (structure.construct || CX.limbo).apply(this, arguments);
         };
-        return ret;
-      })(name,structure);
+      })(name, structure);
 
-      for (var value in structure) {
-        Class[value] = structure[value];
+      CX.log('Applying members... ');
+      var members = Class.prototype = {}, k = 0;
+      for (var member_name in structure) {
+        CX.log('Member name \'' + member_name + '\' ~ ' +
+                (typeof structure[member_name]));
+        members[member_name] = structure[member_name];
+        k++;
       }
 
       if (!Class) {
         throw new Error ('Failed trying to install object ' + name);
       }
       jagger[name] = Class;
+      CX.log('Class ' + name + ' was successfully created with ' + k +
+             ' members.');
       return jagger[name];
+    },
+
+    /**
+     * Basic binding function.
+     */
+    bind: function(context, func) {
+      return function() {
+        return func.apply(context || window, arguments);
+      };
+    },
+
+    /**
+     * Put stuff on the limbo ha ha ha.
+     */
+    limbo: function() {
+      // do nothing
+    },
+
+    load: function(func, arg) {
+      try {
+        func(arg);
+      } catch (x) {
+        //
+      }
     },
 
     /**
@@ -57,8 +92,8 @@
      *                      'console' or 'popup'. By default console is set.
      */
     log: function(debug_object, mechanism) {
-      _object : 'JGLogData: ' + debug_object;
-      _mechanism : mechanism || 'console';
+      var _object = '##CXLogData## ' + debug_object;
+      var _mechanism = mechanism || 'console';
 
       switch (_mechanism) {
         case 'popup':
@@ -68,20 +103,6 @@
         default:
           console.log(_object);
           break;
-      }
-    },
-
-    bind: function(context, func) {
-      return function() {
-        return func.apply(context || window);
-      };
-    },
-
-    load: function(func, arg) {
-      try {
-        func(arg);
-      } catch (x) {
-        //
       }
     }
   };

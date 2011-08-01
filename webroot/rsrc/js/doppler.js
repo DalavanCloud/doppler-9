@@ -2,9 +2,9 @@
 // Use of this source code is governed by a Apache License (v2.0) that can be
 // found in the LICENSE file.
 
-JG.log('About to install Doppler.');
+CX.log('About to install Doppler.');
 
-JG.Provide('Doppler', {
+CX.provide('Doppler', {
   _doppler_transport : null,
   _method : null,
   _url : null,
@@ -23,45 +23,28 @@ JG.Provide('Doppler', {
     this._url = url;
     this._method = method || 'GET';
     this._callback = callback;
-    JG.log('Doppler: constructed! [DONE]');
+    CX.log('Doppler: constructed! [DONE]');
   },
 
   setOptions: function(test, origin, user_host) {
     this._test = test || '__IMAGE__';
     this._origin = origin;
     this._user_host = user_host || 'none';
-    JG.log('Doppler: setOptions [DONE]');
+    CX.log('Doppler: setOptions [DONE]');
   },
 
-  run: function() {
-    var unique_host = this._generateUniqueHostName(),
-        clear_host = this._origin.replace(/[.]/g,"");
-
-    this._host = 'http://' + clear_host + '-' + unique_host + '.' + this._url;
-
-    if (this._test == '__IMAGE__') {
-      this._host = this._host + '?test=image&';
-    } else {
-      this._host = this._host + '?test=lorem&';
-    }
-
-    this._host = this._host + this._user_host;
-
+  execute: function() {
+    this._generateUniqueHostName();
     this._runTest();
-    this._runHTTPTest();
-
-    JG.log('Doppler: run [DONE]');
+    // Start DNS lookup test.
+    this._doRequest(_onDNSComplete);
+    CX.log('Doppler: run [DONE]');
   },
 
   _onDopplerComplete: function() {
     this._stats['host'] = this._host;
     this._callback(this._stats, this._response);
-    JG.log('Doppler: _onDopplerComplete [DONE]');
-  },
-
-  _runTest: function() {
-    // Start DNS lookup test.
-    this._doRequest(_onDNSComplete);
+    CX.log('Doppler: _onDopplerComplete [DONE]');
   },
 
   _onDNSComplete: function() {
@@ -105,13 +88,25 @@ JG.Provide('Doppler', {
     }
 
     this._doppler_transport.open(this._method, this._host);
-    this._doppler_transport.onreadystatechange = JG.bind(this, this.callback)
+    this._doppler_transport.onreadystatechange = CX.bind(this, this.callback)
 
     this._stats['start'] = id(new Date()).getTime();
     this._doppler_transport.send();
   },
 
   _generateUniqueHostName: function() {
-    return Math.floor(Math.random()*(445588771122)).toString(32);
+    var rand = Math.floor(Math.random()*(445588771122)).toString(32),
+        unique_host = this._generateUniqueHostName(),
+        clear_host = this._origin.replace(/[.]/g,"");
+
+    this._host = 'http://' + clear_host + '-' + unique_host + '.' + this._url;
+
+    if (this._test == '__IMAGE__') {
+      this._host = this._host + '?test=image&';
+    } else {
+      this._host = this._host + '?test=lorem&';
+    }
+
+    this._host = this._host + this._user_host;
   }
 });

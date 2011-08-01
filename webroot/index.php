@@ -115,12 +115,11 @@ function build_doppler_corpus($test, $user_ip, $target_url, $user_host) {
     c.innerHTML = response;
   };
 
-  JG.log('Starting...');
-  new JG.Doppler('GET', '{$target_url}', printResponse)
+  CX.log('Starting...');
+  new CX.Doppler('GET', '{$target_url}', printResponse)
     .setOptions('{$test}', '{$user_ip}', '{$user_host}')
-    .run();
+    .execute();
 })();
 </script>
 EODOPPLER;
 }
-
