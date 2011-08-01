@@ -20,11 +20,9 @@ if (isset($_SERVER["HTTP_X_FORWARDED_FOR"])) {
 
 $doppler_corpus = null;
 if ($_POST) {
-  $request = $_POST['__image__'] ? '?test=image' : '?test=lorem';
-  $request .= '&origin='.$target_domain[1];
-  $unique_host = str_replace('.', '', $user_ip).'-'.uniqid();
-  $request_url = 'http://'.$unique_host.'.'.$target_domain[0].'/'.$request;
-  $doppler_corpus = build_doppler_corpus($request_url, $target_domain);
+  $request = $_POST['__image__'] ? '__IMAGE__' : '__LOREM__';
+  $doppler_corpus = build_doppler_corpus(
+                      $request, $user_ip, $target_domain[0], $target_domain[1]);
 }
 
 $html_content = <<<EOHTML
@@ -34,6 +32,7 @@ $html_content = <<<EOHTML
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>Doppler Client-side</title>
     <link rel="stylesheet" type="text/css" href="/rsrc/style.css" />
+    <script type="text/javascript" src="/rsrc/js/init.js"></script>
   </head>
   <body>
     <a class="doppler-hidden-button" href="/">
@@ -70,59 +69,57 @@ echo $html_content;
 /**
  * Doppler Script builder
  */
-function build_doppler_corpus($target_url, $target_domain) {
+function build_doppler_corpus($test, $user_ip, $target_url, $user_host) {
   return <<<EODOPPLER
+<script type="text/javascript" src="/rsrc/js/doppler.js"></script>
 <script type="text/javascript">
   /**
    * We need to minimize the footprint since this is highly critical to the
    * performance of the script.
    */
-  var doppler;
-  try {
-    try {
-       doppler = new XMLHttpRequest();
-    } catch (x) {
-      doppler = new ActiveXObject("Msxml2.XMLHTTP");
-    }
-  } catch (x) {
-    doppler = new ActiveXObject("Microsoft.XMLHTTP");
-  }
+(function() {
+  function printResponse(doppler_stat, doppler_reponse) {
+    var dns_response = JSON.parse(doppler_reponse.dns),
+      http_response = JSON.parse(doppler_reponse.http),
+      stats = null, response = null,
+      c = document.getElementById('doppler-content'),
+      s = document.getElementById('doppler-status'),
+      e = document.getElementById('doppler-epoch');
 
-  var start = 0, end = 0, duration = 0,
-    c = document.getElementById('doppler-content');
-    s = document.getElementById('doppler-status');
-    e = document.getElementById('doppler-epoch');
+    s.innerHTML = '--- Doppler Completed! ---';
+    s.style.background = '#68A64D';
 
-  doppler.open("GET", "{$target_url}");
-  doppler.onreadystatechange = function() {
-    if ((doppler.readyState == 4) && (doppler.status == 200)) {
-      end = new Date().getTime();
-      s.innerHTML = '--- Doppler Completed! ---';
-      s.style.background = '#68A64D';
-      doppler_response = JSON.parse(doppler.responseText);
-      duration = end-start;
+    stats =
+      "<h3>Information:</h3> <br>" +
+      "<strong>Target site:</strong>    " +
+        doppler_stat.host + "<br><br>" +
 
-      e.innerHTML =
-        "<h3>Information:</h3> <br>" +
-        "<strong>Target site:</strong>    " + "{$target_url}" + "<br><br>" +
-        "<strong>NETWORK LATENCY:</strong>  " +
-          (duration-(doppler_response.epoch/1000)) + " ms<br>" +
-        "<strong>Request Duration:</strong>   " +
-          duration + " ms " + "<br>" +
-        "<strong>Server Processing Time:</strong>   " +
-          doppler_response.epoch + " us<br><br>" +
-        "<strong>DOWNLOAD TIMESTAMP:</strong><br>" +
-          "Started at:         " + start + "<br>" +
-          "Completed at:    " + end;
+      "<strong>DNS Lookup:</strong>  " +
+        doppler_stat.dns + " ms<br>" +
 
-      c.innerHTML = '<strong>RESPONSE TO:</strong>  <i>' +
-                    doppler_response.title + '</i><br><br>' +
-                    doppler_response.content;
-    }
+      "<strong>Network Latency:</strong>  " +
+        (doppler_stat.http-(http_response.epoch/1000)) + " ms<br>" +
+
+      "<strong>Request Duration:</strong>   " +
+        doppler_stat.http + " ms " + "<br>" +
+
+      "<strong>Server Processing Time:</strong>   " +
+        http_response.epoch + " us<br><br>";
+
+    response =
+      '<strong>RESPONSE TO:</strong>  <i>' +
+        http_response.title + '</i><br><br>' +
+        http_response.content;
+
+    e.innerHTML = stats;
+    c.innerHTML = response;
   };
 
-  start = new Date().getTime();
-  doppler.send();
+  JG.log('Starting...');
+  new JG.Doppler('GET', '{$target_url}', printResponse)
+    .setOptions('{$test}', '{$user_ip}', '{$user_host}')
+    .run();
+})();
 </script>
 EODOPPLER;
 }

@@ -8,32 +8,40 @@
  */
 (function() {
 
-  if (!window.JG) {
-    window.JG = {};
-  } else {
+  if (window.JG) {
     return;
   }
 
   /**
    * TOOLS
    */
-  id: function(obj) {
+  function id(obj) {
     return obj;
-  }
+  };
 
-  JG = {
+  window.JG = {
     /**
      * Basic object installation
      */
-    provide: function(name, structure) {
-      var newClass = window.JG[name];
-      if (!newClass) {
+    Provide: function(name, structure) {
+      var jagger = window.JG[name];
+
+      var Class = (function(name, structure){
+        var ret = function() {
+          (structure.construct || JG.Null).apply(this, arguments);
+        };
+        return ret;
+      })(name,structure);
+
+      for (var value in structure) {
+        Class[value] = structure[value];
+      }
+
+      if (!Class) {
         throw new Error ('Failed trying to install object ' + name);
       }
-      for (var value in structure) {
-        newClass[value] = structure[value];
-      }
-      return newClass;
+      jagger[name] = Class;
+      return jagger[name];
     },
 
     /**
@@ -49,10 +57,7 @@
      *                      'console' or 'popup'. By default console is set.
      */
     log: function(debug_object, mechanism) {
-      _object : null;
-      _mechanism : null;
-
-      _object : 'Object: ' + debug_object;
+      _object : 'JGLogData: ' + debug_object;
       _mechanism : mechanism || 'console';
 
       switch (_mechanism) {
@@ -78,45 +83,6 @@
       } catch (x) {
         //
       }
-    },
-
-    /**
-     * Get the a node from an ID
-     *
-     * @param  id     ID that we have to lookup on the document
-     * @return node   node where the ID was found.
-     */
-    $: function(id) {
-      var node = document.getElementById(id);
-      if (!node || (node.id != id)) {
-        throw new Error(
-          'The given ID is not available.');
-      }
-      return node;
-    },
-
-
-    /**
-     * Set an attribute on a node.
-     *
-     * @param  node   target node.
-     * @param  attr   attribute to be added.
-     * @param  value  attribute value.
-     * @return bool   If the attribute was changed TRUE, else FALSE.
-     */
-    $A: function(node, attribute, value) {
-      try {
-        prev_value = node.getAttribute(attribute);
-        node.setAttribute(attribute, value);
-        if (prev_value == node.getAttribute(attribute)) {
-          return false;
-        }
-        return true;
-      } catch (x) {
-        throw new Error('Failed trying to change to node (' + node + ')' +
-          ' attibure' + '(' + attribute + ') to {' + value + '}');
-      }
-    },
-
+    }
   };
 })();
