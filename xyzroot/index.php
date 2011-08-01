@@ -12,6 +12,7 @@ $run_test = $_GET['test'];
 $statistics = $_GET['stats'];
 $origin = $_GET['origin'];
 
+$file = 'dns.gif';
 $files = '(dns|http).gif';
 $tokens = array("\r\n", "\n", "\r");
 
@@ -39,7 +40,7 @@ if ($statistics) {
 $response = array('DOPPLER-NO-REQUEST-TEST', 'doppler-response-here');
 if (preg_match('#(.*)'.$files.'($|(.*)$)#', $path) || ($run_test == 'image')) {
   $finfo = new finfo(FILEINFO_MIME);
-  $mime = $finfo->file('dns.gif');
+  $mime = $finfo->file($file);
   if ($path) {
     header("Content-Type: {$mime};");
   } else {

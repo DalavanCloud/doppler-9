@@ -23,7 +23,7 @@ if ($_POST) {
   $request = $_POST['__image__'] ? '?test=image' : '?test=lorem';
   $request .= '&origin='.$target_domain[1];
   $unique_host = str_replace('.', '', $user_ip).'-'.uniqid();
-  $request_url = 'http://'.$unique_host.$target_domain[0].'/'.$request;
+  $request_url = 'http://'.$unique_host.'.'.$target_domain[0].'/'.$request;
   $doppler_corpus = build_doppler_corpus($request_url, $target_domain);
 }
 
@@ -77,7 +77,6 @@ function build_doppler_corpus($target_url, $target_domain) {
    * We need to minimize the footprint since this is highly critical to the
    * performance of the script.
    */
-
   var doppler;
   try {
     try {
@@ -105,7 +104,7 @@ function build_doppler_corpus($target_url, $target_domain) {
 
       e.innerHTML =
         "<h3>Information:</h3> <br>" +
-        "<strong>Target site:</strong>    " + "{$target_domain}" + "<br><br>" +
+        "<strong>Target site:</strong>    " + "{$request_url}" + "<br><br>" +
         "<strong>NETWORK LATENCY:</strong>  " +
           (duration-(doppler_response.epoch/1000)) + " ms<br>" +
         "<strong>Request Duration:</strong>   " +
