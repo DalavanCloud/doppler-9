@@ -33,7 +33,7 @@ $html_content = <<<EOHTML
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>Doppler Client-side</title>
-    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="stylesheet" type="text/css" href="/rsrc/style.css" />
   </head>
   <body>
     <a class="doppler-hidden-button" href="/">
