@@ -104,7 +104,7 @@ function build_doppler_corpus($target_url, $target_domain) {
 
       e.innerHTML =
         "<h3>Information:</h3> <br>" +
-        "<strong>Target site:</strong>    " + "{$request_url}" + "<br><br>" +
+        "<strong>Target site:</strong>    " + "{$target_url}" + "<br><br>" +
         "<strong>NETWORK LATENCY:</strong>  " +
           (duration-(doppler_response.epoch/1000)) + " ms<br>" +
         "<strong>Request Duration:</strong>   " +
