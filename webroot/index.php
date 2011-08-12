@@ -113,6 +113,10 @@ function build_doppler_corpus($test, $user_ip, $target_url, $user_host) {
 
     response =
       '<strong>RESPONSE TO:</strong>  <i>' +
+        dns_response.title + '</i><br><br>' +
+        dns_response.content + '<br><br>' +
+
+      '<strong>RESPONSE TO:</strong>  <i>' +
         http_response.title + '</i><br><br>' +
         http_response.content;
 
