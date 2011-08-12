@@ -1,74 +1,76 @@
+// Copyright (c) 2011 Cristian Adamo. All rights reserved.
+// Use of this source code is governed by a Apache License (v2.0) that can be
+// found in the LICENSE file.
 
-JG.provide('Doppler', {
+CX.log('About to install Doppler.');
+
+CX.provide('Doppler', {
   _doppler_transport : null,
   _method : null,
   _url : null,
-  _host: null,
+  _host : null,
+  _origin : null,
+  _user_host : null,
   _callback : null,
+  _test : null,
   _stats: {},
-  _test: null,
+  _response: {},
 
-  init: function(method, url, callback) {
-    if (!url) {
-      return;
-    }
+  construct: function(method, url, callback) {
     this._url = url;
     this._method = method || 'GET';
     this._callback = callback;
+    return this;
   },
 
-  setTest: function(test) {
+  setOptions: function(test, origin, user_host) {
     this._test = test || '__IMAGE__';
-  }
-
-  run: function() {
-    if (!this._test)
-      return;
-    }
-
-    var unique_host = this._generateUniqeHostName();
-    this._host = 'http://' + unique_host + this._url;
-
-
+    this._origin = origin;
+    this._user_host = user_host || null;
+    return this;
   },
 
-  onDopplerComplete: function() {
-    this._stats['dns'] = this._stats.dns - this._stats.http;
-    this._callback(this._stats)
+  execute: function() {
+    this._generateUniqueHostName();
+    this._doRequest(this._onDNSComplete);
+    CX.log('Doppler: run [DONE]');
   },
 
-  _runDNSTest: function() {
-    this._doRequest('__dns__', _onDNSComplete);
-  },
-
-  _runHTTPTest: function() {
-    this._doRequest('__http__', _onHTTPComplete);
+  _onDopplerComplete: function() {
+    this._stats['host'] = this._host;
+    this._callback(this._stats, this._response);
   },
 
   _onDNSComplete: function() {
     if ((this._doppler_transport.readyState == 4) &&
-        (_doppler_transport.status == 200)) {
-      this._stats['dns'] = id(new Date()).getTime() - this._stats['start'];
+        (this._doppler_transport.status == 200)) {
+      this._stats['dns'] = CX.id(new Date()).getTime() - this._stats['start'];
+      this._response['dns'] = this._doppler_transport.responseText;
+      // start HTTP test
+      this._doRequest(this._onHTTPComplete);
     }
   },
 
   _onHTTPComplete: function() {
     if ((this._doppler_transport.readyState == 4) &&
-        (_doppler_transport.status == 200)) {
-      this._stats['http'] = id(new Date()).getTime() - this._stats['start'];
+        (this._doppler_transport.status == 200)) {
+      this._stats['http'] = CX.id(new Date()).getTime() - this._stats['start'];
+      this._response['http'] = this._doppler_transport.responseText;
+
+      this._onDopplerComplete();
     }
   },
 
-  _doRequest: function(type, callback) {
+  _doRequest: function(callback) {
     if (this._doppler_transport) {
       this._doppler_transport.abort();
       this._doppler_transport = null;
     }
 
     /**
-      * We need to minimize the footprint since this is highly critical to the
-      * performance of the test.
-      */
+     * We need to minimize the footprint since this is highly critical to the
+     * performance of the test.
+     */
     try {
       try {
         this._doppler_transport = new XMLHttpRequest();
@@ -76,51 +78,28 @@ JG.provide('Doppler', {
         this._doppler_transport = new ActiveXObject("Msxml2.XMLHTTP");
       }
     } catch (x) {
-        this._doppler_transport = new ActiveXObject("Microsoft.XMLHTTP");
+      this._doppler_transport = new ActiveXObject("Microsoft.XMLHTTP");
     }
 
-    this._doppler_transport.open(this._method, host);
-    this._doppler_transport.onreadystatechange = JG.bind(this, this.callback)
+    this._doppler_transport.open(this._method, this._host);
+    this._doppler_transport.onreadystatechange = CX.bind(this, callback)
 
-    this._stats['start'] = id(new Date()).getTime();
+    this._stats['start'] = CX.id(new Date()).getTime();
     this._doppler_transport.send();
+  },
+
+  _generateUniqueHostName: function() {
+    var unique_host = Math.floor(Math.random()*(445588771122)).toString(32),
+        clear_host = this._origin.replace(/[.]/g,"");
+
+    this._host = 'http://' + clear_host + '-' + unique_host + '.' + this._url;
+
+    if (this._test == '__IMAGE__') {
+      this._host = this._host + '?test=image&';
+    } else {
+      this._host = this._host + '?test=lorem&';
+    }
+
+    this._host = this._host + this._user_host;
   }
-
-  _generateUniqeHostName: function() {
-    return Math.floor(Math.random()*(445588771122)).toString(32);
-  }
-
-
-
-
-
-   var start = 0, end = 0, duration = 0,
-     c = document.getElementById('doppler-content');
-     s = document.getElementById('doppler-status');
-     e = document.getElementById('doppler-epoch');
-
-       s.innerHTML = '--- Doppler Completed! ---';
-       s.style.background = '#68A64D';
-       doppler_response = JSON.parse(doppler.responseText);
-       duration = end-start;
-
-       e.innerHTML =
-         "<h3>Information:</h3> <br>" +
-         "<strong>Target site:</strong>    " + "{$target_domain}" + "<br><br>" +
-         "<strong>NETWORK LATENCY:</strong>  " +
-           (duration-(doppler_response.epoch/1000)) + " ms<br>" +
-         "<strong>Request Duration:</strong>   " +
-           duration + " ms " + "<br>" +
-         "<strong>Server Processing Time:</strong>   " +
-           doppler_response.epoch + " us<br><br>" +
-         "<strong>DOWNLOAD TIMESTAMP:</strong><br>" +
-           "Started at:         " + start + "<br>" +
-           "Completed at:    " + end;
-
-       c.innerHTML = '<strong>RESPONSE TO:</strong>  <i>' +
-                     doppler_response.title + '</i><br><br>' +
-                     doppler_response.content;
-     }
-   };
-
 });
