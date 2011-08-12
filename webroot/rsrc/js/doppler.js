@@ -100,6 +100,6 @@ CX.provide('Doppler', {
       this._host = this._host + '?test=lorem&';
     }
 
-    this._host = this._host + this._user_host;
+    this._host = this._host + 'origin=' + this._user_host;
   }
 });
