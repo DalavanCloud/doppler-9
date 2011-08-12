@@ -105,7 +105,7 @@ function build_doppler_corpus($test, $user_ip, $target_url, $user_host) {
         (doppler_stat.http-(http_response.epoch/1000)) + " ms<br>" +
 
       "<strong>Request Duration:</strong>   " +
-        doppler_stat.dns + doppler_stat.http + " ms" + "<br>" +
+        (doppler_stat.dns + doppler_stat.http) + " ms" + "<br>" +
 
       "<strong>Server Processing Time:</strong>   " +
         http_response.epoch + " us<br><br>";
