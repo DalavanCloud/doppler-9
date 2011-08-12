@@ -71,6 +71,7 @@ echo $html_content;
  */
 function build_doppler_corpus($test, $user_ip, $target_url, $user_host) {
   return <<<EODOPPLER
+<script type="text/javascript" src="/rsrc/js/dom.js"></script>
 <script type="text/javascript" src="/rsrc/js/doppler.js"></script>
 <script type="text/javascript">
   /**
