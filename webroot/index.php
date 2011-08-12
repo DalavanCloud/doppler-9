@@ -98,11 +98,14 @@ function build_doppler_corpus($test, $user_ip, $target_url, $user_host) {
       "<strong>DNS Lookup:</strong>  " +
         doppler_stat.dns + " ms<br>" +
 
+      "<strong>HTTP Request:</strong>  " +
+        doppler_stat.http + " ms<br>" +
+
       "<strong>Network Latency:</strong>  " +
         (doppler_stat.http-(http_response.epoch/1000)) + " ms<br>" +
 
       "<strong>Request Duration:</strong>   " +
-        doppler_stat.http + " ms " + "<br>" +
+        doppler_stat.dns + doppler_stat.http + " ms" + "<br>" +
 
       "<strong>Server Processing Time:</strong>   " +
         http_response.epoch + " us<br><br>";
