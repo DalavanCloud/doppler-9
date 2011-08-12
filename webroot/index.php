@@ -91,7 +91,8 @@ function build_doppler_corpus($test, $user_ip, $target_url, $user_host) {
     s.style.background = '#68A64D';
 
     stats =
-      "<h3>Information:</h3> <br>" +
+      "<h3>Execution data collected:</h3> <br>" +
+
       "<strong>Target site:</strong>    " +
         doppler_stat.host + "<br><br>" +
 
@@ -99,12 +100,12 @@ function build_doppler_corpus($test, $user_ip, $target_url, $user_host) {
         doppler_stat.dns + " ms<br>" +
 
       "<strong>HTTP Request:</strong>  " +
-        doppler_stat.http + " ms<br>" +
+        doppler_stat.http + " ms<br><br>" +
 
       "<strong>Network Latency:</strong>  " +
         (doppler_stat.http-(http_response.epoch/1000)) + " ms<br>" +
 
-      "<strong>Request Duration:</strong>   " +
+      "<strong>Total Request Duration:</strong>   " +
         (doppler_stat.dns + doppler_stat.http) + " ms" + "<br>" +
 
       "<strong>Server Processing Time:</strong>   " +
