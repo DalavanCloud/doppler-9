@@ -77,50 +77,6 @@ function build_doppler_corpus($test, $user_ip, $target_url, $user_host) {
    * We need to minimize the footprint since this is highly critical to the
    * performance of the script.
    */
-<<<<<<< HEAD
-  var doppler;
-  try {
-    try {
-       doppler = new XMLHttpRequest();
-    } catch (x) {
-      doppler = new ActiveXObject("Msxml2.XMLHTTP");
-    }
-  } catch (x) {
-    doppler = new ActiveXObject("Microsoft.XMLHTTP");
-  }
-
-  var start = 0, end = 0, duration = 0,
-    c = document.getElementById('doppler-content');
-    s = document.getElementById('doppler-status');
-    e = document.getElementById('doppler-epoch');
-
-  doppler.open("GET", "{$target_url}");
-  doppler.onreadystatechange = function() {
-    if ((doppler.readyState == 4) && (doppler.status == 200)) {
-      end = new Date().getTime();
-      s.innerHTML = '--- Doppler Completed! ---';
-      s.style.background = '#68A64D';
-      doppler_response = JSON.parse(doppler.responseText);
-      duration = end-start;
-
-      e.innerHTML =
-        "<h3>Information:</h3> <br>" +
-        "<strong>Target site:</strong>    " + "{$target_url}" + "<br><br>" +
-        "<strong>NETWORK LATENCY:</strong>  " +
-          (duration-(doppler_response.epoch/1000)) + " ms<br>" +
-        "<strong>Request Duration:</strong>   " +
-          duration + " ms " + "<br>" +
-        "<strong>Server Processing Time:</strong>   " +
-          doppler_response.epoch + " us<br><br>" +
-        "<strong>DOWNLOAD TIMESTAMP:</strong><br>" +
-          "Started at:         " + start + "<br>" +
-          "Completed at:    " + end;
-
-      c.innerHTML = '<strong>RESPONSE TO:</strong>  <i>' +
-                    doppler_response.title + '</i><br><br>' +
-                    doppler_response.content;
-    }
-=======
 (function() {
   function printResponse(doppler_stat, doppler_reponse) {
     var dns_response = JSON.parse(doppler_reponse.dns),
@@ -157,7 +113,6 @@ function build_doppler_corpus($test, $user_ip, $target_url, $user_host) {
 
     e.innerHTML = stats;
     c.innerHTML = response;
->>>>>>> Add Doppler js lib
   };
 
   CX.log('Starting...');
